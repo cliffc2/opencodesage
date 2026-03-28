@@ -4,7 +4,8 @@ Skills for integrating OpenCode with OpenSage's Neo4j memory system and dynamic 
 
 ## Skills
 
-- **opensage-memory-api.md** - Memory API reference  
+- **opencode-opensage.md** - Complete integration guide
+- **opensage-memory-api.md** - Memory API reference
 - **opensage-local-setup.md** - OpenSage setup guide
 
 ## Quick Start
@@ -14,7 +15,7 @@ Skills for integrating OpenCode with OpenSage's Neo4j memory system and dynamic 
 cd /Users/ghostgear/opencodesage
 ./start_opencodesage.sh
 ```
-This will start Neo4j, Memory API, and Dynamic LLM Bridge with an interactive model selection menu.
+This starts Neo4j, Memory API, and Dynamic LLM Bridge with an interactive model selection menu.
 
 ### 2. Manual Start (Alternative)
 ```bash
@@ -35,22 +36,37 @@ python opencode_dynamic_bridge.py &
 
 ## Usage
 
-### Memory
+### Memory Operations
 ```bash
+# Store a memory item
 !curl "http://localhost:5555/remember?key=notes&value=My notes"
+
+# Retrieve a memory item
 !curl "http://localhost:5555/recall?key=notes"
+
+# List all memories
+!curl "http://localhost:5555/list"
+
+# Search memories
+!curl "http://localhost:5555/search?q=API"
 ```
 
-### Switch Models (both OpenCode & OpenSage use same model)
+### Model Selection (Both OpenCode & OpenSage use the same model)
+The startup script `./start_opencodesage.sh` provides an interactive menu:
+- 1) minimax-m2.5-free (default, selected after 10 seconds)
+- 2) nemotron-3-super-free
+- 3) mimo-v2-pro-free
+- 4) gpt-5-nano
+- 5) Exit without launching OpenCode
+
+**Direct file edit method:**
 ```bash
-# Change model - both will use it!
-echo "opencode/gpt-5-nano" > ~/.opencode/current_model
+echo "opencode/minimax-m2.5-free" > ~/.opencode/current_model
 ```
 
-### Switch Models (both OpenCode & OpenSage use same model)
+**Direct command method:**
 ```bash
-# Change model - both will use it!
-echo "opencode/gpt-5-nano" > ~/.opencode/current_model
+opencode --model opencode/minimax-m2.5-free
 ```
 
 ## Files
@@ -61,3 +77,12 @@ echo "opencode/gpt-5-nano" > ~/.opencode/current_model
 | `opencode_dynamic_bridge.py` | LLM bridge with dynamic model (port 5557) |
 | `opensage_memory.py` | CLI memory tool |
 | `test_*.py` | Test scripts |
+
+## Model Synchronization
+
+Both OpenCode and OpenSage automatically use the same model defined in:
+- `~/.opencode/current_model` (shared file)
+- Updated by `bin/opencode` wrapper when using `--model` flag
+- Read by `opencode_dynamic_bridge.py` to synchronize LLM usage
+
+Default model: `opencode/minimax-m2.5-free`
