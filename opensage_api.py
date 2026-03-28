@@ -44,11 +44,12 @@ class Handler(BaseHTTPRequestHandler):
             value = query.get("value", [""])[0]
             if key and value:
                 with get_driver() as driver:
-                    driver.execute_query(
-                        "MERGE (m:Memory {key: $key}) SET m.value = $value, m.updated = timestamp()",
-                        key=key,
-                        value=value,
-                    )
+                    with driver.session() as session:
+                        session.run(
+                            "MERGE (m:Memory {key: $key}) SET m.value = $value, m.updated = timestamp()",
+                            key=key,
+                            value=value,
+                        )
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
@@ -61,13 +62,17 @@ class Handler(BaseHTTPRequestHandler):
             key = query.get("key", [""])[0]
             if key:
                 with get_driver() as driver:
-                    result = driver.execute_query(
-                        "MATCH (m:Memory {key: $key}) RETURN m.value as value", key=key
-                    )
-                    records = list(result.records)
-                    value = (
-                        records[0]["value"] if records and records[0]["value"] else None
-                    )
+                    with driver.session() as session:
+                        result = session.run(
+                            "MATCH (m:Memory {key: $key}) RETURN m.value as value",
+                            key=key,
+                        )
+                        records = list(result)
+                        value = (
+                            records[0]["value"]
+                            if records and records[0]["value"]
+                            else None
+                        )
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
@@ -78,12 +83,11 @@ class Handler(BaseHTTPRequestHandler):
 
         elif path == "/list":
             with get_driver() as driver:
-                result = driver.execute_query(
-                    "MATCH (m:Memory) RETURN m.key as key, m.value as value ORDER BY m.updated DESC"
-                )
-                memories = [
-                    {"key": r["key"], "value": r["value"]} for r in result.records
-                ]
+                with driver.session() as session:
+                    result = session.run(
+                        "MATCH (m:Memory) RETURN m.key as key, m.value as value ORDER BY m.updated DESC"
+                    )
+                    memories = [{"key": r["key"], "value": r["value"]} for r in result]
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
@@ -93,13 +97,14 @@ class Handler(BaseHTTPRequestHandler):
             q = query.get("q", [""])[0]
             if q:
                 with get_driver() as driver:
-                    result = driver.execute_query(
-                        "MATCH (m:Memory) WHERE m.value CONTAINS $q OR m.key CONTAINS $q RETURN m.key as key, m.value as value",
-                        q=q,
-                    )
-                    memories = [
-                        {"key": r["key"], "value": r["value"]} for r in result.records
-                    ]
+                    with driver.session() as session:
+                        result = session.run(
+                            "MATCH (m:Memory) WHERE m.value CONTAINS $q OR m.key CONTAINS $q RETURN m.key as key, m.value as value",
+                            q=q,
+                        )
+                        memories = [
+                            {"key": r["key"], "value": r["value"]} for r in result
+                        ]
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
