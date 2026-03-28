@@ -1,10 +1,10 @@
-# opencodesage
+# OpenCodeSage
 
 Portable AI coding assistant combining OpenCode (frontend/TUI) with OpenSage (backend with Neo4j memory) and dynamic model synchronization.
 
 ## Overview
 
-opencodesage is a self-contained folder that combines:
+OpenCodeSage is a self-contained folder that combines:
 - **OpenCode**: An open-source AI coding agent with a terminal UI and free models
 - **OpenSage**: An AI agent framework with persistent memory (Neo4j) and agent orchestration
 - **Dynamic LLM Bridge**: A service that keeps both OpenCode and OpenSage using the same model
@@ -16,7 +16,7 @@ opencodesage is a self-contained folder that combines:
 - ✅ **Model Synchronization**: Changing the model via `opencode --model` updates both OpenCode and OpenSage automatically
 - ✅ **Persistent Memory**: Neo4j graph database stores memories across sessions
 - ✅ **Portability**: Everything self-contained in one folder (except Neo4j and OpenCode binary which users build/install)
-- ✅ **One-command startup**: `./start_opencodesage.sh` handles Neo4j, Memory API, and LLM Bridge
+- ✅ **One-command startup**: `./start_OpenCodeSage.sh` handles Neo4j, Memory API, and LLM Bridge
 - ✅ **Secure**: Neo4j password required via environment (not hardcoded)
 - ✅ **Free Models**: Uses OpenCode's built-in free providers (no API keys needed for basic usage)
 
@@ -43,8 +43,8 @@ opencodesage is a self-contained folder that combines:
 
 1. **Clone this repository**
    ```bash
-   git clone https://github.com/cliffc2/opencodesage.git
-   cd opencodesage
+   git clone https://github.com/cliffc2/OpenCodeSage.git
+   cd OpenCodeSage
    ```
 
 2. **Build/OpenCode**
@@ -71,7 +71,7 @@ opencodesage is a self-contained folder that combines:
 
 #### One-command startup (recommended)
 ```bash
-./start_opencodesage.sh
+./start_OpenCodeSage.sh
 ```
 
 This script will:
@@ -167,8 +167,8 @@ curl -X POST http://localhost:5557/v1/chat/completions \
 
 - **Model Synchronization**: Changing model via `bin/opencode --model` updates `.opencode/current_model`, which the LLM bridge reads automatically
 - **Persistent Memory**: Neo4j stores memories across sessions (configurable via environment variables)
-- **Portability**: Everything self-contained in the `opencodesage` folder (except Neo4j and OpenCode binary)
-- **One-command startup**: `start_opencodesage.sh` handles Neo4j, Memory API, and LLM Bridge
+- **Portability**: Everything self-contained in the `OpenCodeSage` folder (except Neo4j and OpenCode binary)
+- **One-command startup**: `start_OpenCodeSage.sh` handles Neo4j, Memory API, and LLM Bridge
 - **Secure**: Neo4j password required via environment (not hardcoded in source)
 - **Free Models**: Uses OpenCode's built-in free providers (no API keys needed for basic usage)
 
@@ -176,7 +176,7 @@ curl -X POST http://localhost:5557/v1/chat/completions \
 
 | File/Directory | Description |
 |----------------|-------------|
-| `start_opencodesage.sh` | One-command startup script |
+| `start_OpenCodeSage.sh` | One-command startup script |
 | `opensage_api.py` | Memory API (REST endpoint for Neo4j) |
 | `opencode_dynamic_bridge.py` | LLM bridge (synchronizes model with OpenCode) |
 | `bin/opencode` | Wrapper that updates the shared model file when using `--model` |
@@ -245,4 +245,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Powered by free AI models: Minimax 2.5 Free and Nemotron 3 Super Free
 
 ---
-**Ready to use**: Clone, build OpenCode, set Neo4j password, run `./start_opencodesage.sh`, and start coding with persistent memory and synchronized models!
+**Ready to use**: Clone, build OpenCode, set Neo4j password, run `./start_OpenCodeSage.sh`, and start coding with persistent memory and synchronized models!
