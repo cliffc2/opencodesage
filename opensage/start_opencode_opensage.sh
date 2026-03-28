@@ -1,6 +1,6 @@
 #!/bin/bash
 # OpenCode + OpenSage Startup Script
-# Run: ./start_opencode_opensage.sh
+# Run: ./start_opencodesage.sh
 
 set -e
 
