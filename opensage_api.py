@@ -84,10 +84,10 @@ class Handler(BaseHTTPRequestHandler):
                 memories = [
                     {"key": r["key"], "value": r["value"]} for r in result.records
                 ]
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps(memories).encode())
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(memories).encode())
 
         elif path == "/search":
             q = query.get("q", [""])[0]
