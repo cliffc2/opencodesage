@@ -5,40 +5,44 @@ Complete integration: OpenCode (frontend) ↔ OpenSage (backend with Neo4j memor
 ## Architecture
 
 ```
-┌─────────────┐     HTTP API      ┌──────────────────┐
+┌─────────────┐     HTTP API     ┌──────────────────┐
 │  OpenCode   │ ◄──────────────► │  OpenSage        │
-│  (Frontend) │    Dynamic        │  (Backend)       │
-│             │    Bridge         │                  │
+│  (Frontend) │    Dynamic       │  (Backend)       │
+│             │    Bridge        │                  │
 │  - TUI      │    port 5557     │  - Neo4j Memory  │
 │  - Models   │                  │  - Agents        │
 └─────────────┘                  │  - Tools         │
-                                 └──────────────────┘
-                                         │
-                                         ▼
-                                 ┌──────────────────┐
-                                 │  Neo4j           │
-                                 │  (Graph DB)      │
-                                 └──────────────────┘
+                                  └──────────────────┘
+                                          │
+                                          ▼
+                                  ┌──────────────────┐
+                                  │  Neo4j           │
+                                  │  (Graph DB)      │
+                                  └──────────────────┘
 ```
 
 ## Quick Start
 
-### 1. Start Neo4j
+### 1. Start All Services (Recommended)
 ```bash
+cd /Users/ghostgear/opencodesage
+./start_opencodesage.sh
+```
+This will start Neo4j, Memory API, and Dynamic LLM Bridge with an interactive model selection menu.
+
+### 2. Manual Start (Alternative)
+```bash
+# 1. Start Neo4j
 brew services start neo4j
 # or
 /opt/homebrew/bin/neo4j start
-```
 
-### 2. Start OpenSage Memory API (port 5555)
-```bash
+# 2. Start OpenSage Memory API (port 5555)
 cd /Users/ghostgear/opensage
 source .venv/bin/activate
 python opensage_api.py &
-```
 
-### 3. Start Dynamic Bridge (port 5557)
-```bash
+# 3. Start Dynamic Bridge (port 5557)
 cd /Users/ghostgear/opensage
 source .venv/bin/activate
 python opencode_dynamic_bridge.py &
@@ -62,17 +66,37 @@ curl "http://localhost:5555/search?q=project"
 ```
 
 ### Switch Models (for both OpenCode & OpenSage)
+The startup script `./start_opencodesage.sh` provides an interactive menu to select the model:
+- 1) minimax-m2.5-free (default)
+- 2) nemotron-3-super-free
+- 3) mimo-v2-pro-free
+- 4) gpt-5-nano
+- 5) Exit without launching OpenCode
+
+**Method 1: Via Startup Script (Recommended)**
 ```bash
-# Change model - both will use it!
-echo "opencode/gpt-5-nano" > ~/.opencode/current_model
+./start_opencodesage.sh
+# Select option 1-4 to launch OpenCode with chosen model
+```
 
-# Available models:
-# - opencode/mimo-v2-pro-free
-# - opencode/minimax-m2.5-free  
-# - opencode/nemotron-3-super-free
-# - opencode/gpt-5-nano
+**Method 2: Direct File Edit**
+```bash
+echo "opencode/minimax-m2.5-free" > ~/.opencode/current_model
+```
 
-# Check current model
+**Method 3: Via OpenCode Command**
+```bash
+opencode --model opencode/minimax-m2.5-free
+```
+
+**Available Models:**
+- `opencode/minimax-m2.5-free` (default)
+- `opencode/nemotron-3-super-free`
+- `opencode/mimo-v2-pro-free`
+- `opencode/gpt-5-nano`
+
+**Check Current Model**
+```bash
 curl http://localhost:5557/
 ```
 

@@ -107,14 +107,21 @@ If you prefer to start services individually:
 
 #### Switching the model (used by both OpenCode and OpenSage)
 
+The startup script `./start_opencodesage.sh` now provides an interactive menu to select the model:
+- 1) minimax-m2.5-free (default)
+- 2) nemotron-3-super-free
+- 3) mimo-v2-pro-free
+- 4) gpt-5-nano
+- 5) Exit without launching OpenCode
+
 **Method 1: Direct file edit**
 ```bash
-echo "opencode/gpt-5-nano" > .opencode/current_model
+echo "opencode/minimax-m2.5-free" > .opencode/current_model
 ```
 
 **Method 2: Via opencode command (RECOMMENDED)**
 ```bash
-bin/opencode --model opencode/gpt-5-nano --version
+bin/opencode --model opencode/minimax-m2.5-free --version
 # or any opencode command with --model flag
 ```
 

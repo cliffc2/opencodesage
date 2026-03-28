@@ -86,3 +86,47 @@ echo "  Model:  echo 'opencode/gpt-5-nano' > '$OPENCODE_HOME/current_model'"
 echo ""
 echo "Set NEO4J_PASSWORD in $BASE_DIR/.env (see .env.example) before starting if the memory API exits."
 echo ""
+
+# Offer to launch OpenCode
+echo "Would you like to launch OpenCode now?"
+echo "1) Launch OpenCode with minimax-m2.5-free (default)"
+echo "2) Launch OpenCode with nemotron-3-super-free"
+echo "3) Launch OpenCode with mimo-v2-pro-free"
+echo "4) Launch OpenCode with gpt-5-nano"
+echo "5) Exit without launching OpenCode"
+echo -n "Choose an option [1-5, default 1]: "
+read -t 10 choice
+
+# Default to option 1 if no input or empty input
+if [[ -z "$choice" ]]; then
+    choice=1
+fi
+
+case $choice in
+    1)
+        echo "Launching OpenCode with minimax-m2.5-free..."
+        bin/opencode --model opencode/minimax-m2.5-free
+        ;;
+    2)
+        echo "Launching OpenCode with nemotron-3-super-free..."
+        bin/opencode --model opencode/nemotron-3-super-free
+        ;;
+    3)
+        echo "Launching OpenCode with mimo-v2-pro-free..."
+        bin/opencode --model opencode/mimo-v2-pro-free
+        ;;
+    4)
+        echo "Launching OpenCode with gpt-5-nano..."
+        bin/opencode --model opencode/gpt-5-nano
+        ;;
+    5)
+        echo "Exiting. Services are running:"
+        echo "  - Memory API: http://localhost:${OPENSAGE_API_PORT:-5555}"
+        echo "  - LLM Bridge: http://localhost:${OPENCODE_BRIDGE_PORT:-5557}"
+        echo "  - Neo4j: http://localhost:7474"
+        ;;
+    *)
+        echo "Invalid choice. Launching OpenCode with minimax-m2.5-free (default)..."
+        bin/opencode --model opencode/minimax-m2.5-free
+        ;;
+esac
