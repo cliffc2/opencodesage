@@ -122,7 +122,7 @@ curl -X POST http://localhost:5557/v1/chat/completions \
 - URL: bolt://127.0.0.1:7687
 - HTTP: http://localhost:7474
 - User: neo4j
-- Password: callgraphn4j!
+- Password: [SET VIA ENVIRONMENT VARIABLE NEO4J_PASSWORD]
 
 ## API Endpoints
 

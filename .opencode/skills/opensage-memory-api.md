@@ -46,4 +46,4 @@ curl "http://localhost:5555/search?q=project"
 
 ## Requirements
 - Neo4j running on bolt://127.0.0.1:7687
-- Password: callgraphn4j!
+- Password: Set via NEO4J_PASSWORD environment variable
