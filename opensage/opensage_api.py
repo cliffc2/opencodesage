@@ -16,10 +16,16 @@ import json
 import urllib.parse
 
 import os
+import sys
 
 NEO4J_URI = "bolt://127.0.0.1:7687"
 NEO4J_USER = "neo4j"
-NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "")
+NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
+
+if not NEO4J_PASSWORD:
+    print("ERROR: NEO4J_PASSWORD environment variable is not set")
+    print("Please set it in your .env file or environment")
+    sys.exit(1)
 
 
 def get_driver():
