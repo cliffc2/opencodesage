@@ -1,6 +1,6 @@
 #!/bin/bash
 # OpenCodeSage startup script - starts all services
-# Run from the OpenCodeSage root directory: ./start_OpenCodeSage.sh
+# Run from the OpenCodeSage root directory: ./start_opencodesage.sh
 
 set -e
 
