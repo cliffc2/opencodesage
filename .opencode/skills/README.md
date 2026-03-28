@@ -4,7 +4,6 @@ Skills for integrating OpenCode with OpenSage's Neo4j memory system and dynamic 
 
 ## Skills
 
-- **opencode-opensage.md** - Complete integration guide (READ THIS FIRST)
 - **opensage-memory-api.md** - Memory API reference  
 - **opensage-local-setup.md** - OpenSage setup guide
 
@@ -40,6 +39,12 @@ python opencode_dynamic_bridge.py &
 ```bash
 !curl "http://localhost:5555/remember?key=notes&value=My notes"
 !curl "http://localhost:5555/recall?key=notes"
+```
+
+### Switch Models (both OpenCode & OpenSage use same model)
+```bash
+# Change model - both will use it!
+echo "opencode/gpt-5-nano" > ~/.opencode/current_model
 ```
 
 ### Switch Models (both OpenCode & OpenSage use same model)
