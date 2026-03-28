@@ -242,6 +242,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built upon [OpenSage](https://github.com/opensage-agent/opensage)
 - Uses [litellm](https://github.com/BerriAI/litellm) for LLM abstraction
 - Uses [Neo4j](https://neo4j.com/) for persistent graph storage
+- Powered by free AI models: Minimax 2.5 Free and Nemotron 3 Super Free
 
 ---
 **Ready to use**: Clone, build OpenCode, set Neo4j password, run `./start_opencodesage.sh`, and start coding with persistent memory and synchronized models!
