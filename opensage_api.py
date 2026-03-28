@@ -14,6 +14,20 @@ Then use: http://localhost:5555/
 
 import json
 import logging
+import time
+import uuid
+
+try:
+    from plugs.registry import load_plugins, notify  # type: ignore
+
+    load_plugins()
+except Exception:
+
+    def notify(event, payload):  # type: ignore
+        pass
+
+
+import logging
 import os
 import sys
 import urllib.parse
@@ -54,10 +68,16 @@ class Handler(BaseHTTPRequestHandler):
                                 key=key,
                                 value=value,
                             )
+                    # Notify plugs if this is a note write
+                    try:
+                        if isinstance(key, str) and key.startswith("notes:"):
+                            notify("notes_write", {"key": key, "value": value})
+                    except Exception:
+                        pass
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.end_headers()
-                    self.wfile.write(json.dumps({"status": "ok", "key": key}).encode())
+                self.wfile.write(json.dumps({"status": "ok", "key": key}).encode())
                 except Exception as e:
                     logger.exception("Error handling /remember")
                     self.send_response(500)
@@ -108,6 +128,13 @@ class Handler(BaseHTTPRequestHandler):
                         memories = [
                             {"key": r["key"], "value": r["value"]} for r in result
                         ]
+                        # Surface only notes (namespaced) keys
+                        memories = [
+                            m
+                            for m in memories
+                            if isinstance(m["key"], str)
+                            and m["key"].startswith("notes:")
+                        ]
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
@@ -121,19 +148,31 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/search":
             q = query.get("q", [""])[0]
             if q:
-                with get_driver() as driver:
-                    with driver.session() as session:
-                        result = session.run(
-                            "MATCH (m:Memory) WHERE m.value CONTAINS $q OR m.key CONTAINS $q RETURN m.key as key, m.value as value",
-                            q=q,
-                        )
-                        memories = [
-                            {"key": r["key"], "value": r["value"]} for r in result
-                        ]
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps(memories).encode())
+                try:
+                    with get_driver() as driver:
+                        with driver.session() as session:
+                            result = session.run(
+                                "MATCH (m:Memory) WHERE m.value CONTAINS $q OR m.key CONTAINS $q RETURN m.key as key, m.value as value",
+                                q=q,
+                            )
+                            memories = [
+                                {"key": r["key"], "value": r["value"]} for r in result
+                            ]
+                            memories = [
+                                m
+                                for m in memories
+                                if isinstance(m["key"], str)
+                                and m["key"].startswith("notes:")
+                            ]
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps(memories).encode())
+                except Exception as e:
+                    logger.exception("Error handling /search")
+                    self.send_response(500)
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": str(e)}).encode())
             else:
                 self.send_response(400)
                 self.end_headers()
@@ -154,6 +193,110 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(
                     json.dumps({"status": "fail", "error": str(e)}).encode()
                 )
+        elif path == "/notes":
+            note_id = query.get("id", [""])[0]
+            try:
+                with get_driver() as driver:
+                    with driver.session() as session:
+                        if note_id:
+                            key = (
+                                note_id
+                                if note_id.startswith("notes:")
+                                else f"notes:{note_id}"
+                            )
+                            result = session.run(
+                                "MATCH (m:Memory {key: $key}) RETURN m.value as value",
+                                key=key,
+                            )
+                            records = list(result)
+                            payload = (
+                                json.loads(records[0]["value"])
+                                if records and records[0]["value"]
+                                else None
+                            )
+                            self.send_response(200)
+                            self.send_header("Content-Type", "application/json")
+                            self.end_headers()
+                            self.wfile.write(
+                                json.dumps({"id": key, "payload": payload}).encode()
+                            )
+                        else:
+                            result = session.run(
+                                "MATCH (m:Memory) WHERE m.key STARTS WITH 'notes:' RETURN m.key as key, m.value as value ORDER BY m.updated DESC"
+                            )
+                            notes = [
+                                {
+                                    "id": r["key"],
+                                    "payload": json.loads(r["value"])
+                                    if r["value"]
+                                    else None,
+                                }
+                                for r in result
+                            ]
+                            self.send_response(200)
+                            self.send_header("Content-Type", "application/json")
+                            self.end_headers()
+                            self.wfile.write(json.dumps(notes).encode())
+            except Exception as e:
+                logger.exception("Error handling /notes")
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        if path == "/notes":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length) if content_length > 0 else b"{}"
+            try:
+                payload = json.loads(body)
+            except Exception:
+                payload = {}
+
+            content = payload.get("content")
+            author = payload.get("author", "OpenCode")
+            tags = payload.get("tags", [])
+            archived = payload.get("archived", False)
+            if content:
+                note_id = str(uuid.uuid4())
+                key = f"notes:{note_id}"
+                created_at = payload.get("created_at", time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+                value = json.dumps({
+                    "content": content,
+                    "author": author,
+                    "created_at": created_at,
+                    "tags": tags,
+                    "archived": archived,
+                })
+                try:
+                    with get_driver() as driver:
+                        with driver.session() as session:
+                            session.run(
+                                "MERGE (m:Memory {key: $key}) SET m.value = $value, m.updated = timestamp()",
+                                key=key,
+                                value=value,
+                            )
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"id": key, "status": "ok"}).encode())
+                    try:
+                        notify("notes_write", {"key": key, "value": value})
+                    except Exception:
+                        pass
+                except Exception as e:
+                    logger.exception("Error handling /notes POST")
+                    self.send_response(500)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": str(e)}).encode())
+            else:
+                self.send_response(400)
+                self.end_headers()
         else:
             self.send_response(404)
             self.end_headers()
