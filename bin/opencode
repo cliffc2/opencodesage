@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Wrapper for opencode that updates the shared model file when -m/--model is used.
+# Scans the full argv so flags can appear in any order (e.g. opencode -C /tmp -m model run).
+
+OPENCODE_HOME="${OPENCODE_HOME:-$HOME/.opencode}"
+REAL_BIN="${OPENCODE_HOME}/bin/opencode_real"
+
+MODEL_ARG=""
+i=1
+while [[ $i -le $# ]]; do
+  case "${!i}" in
+    -m|--model)
+      j=$((i + 1))
+      if [[ $j -le $# ]]; then
+        MODEL_ARG="${!j}"
+      fi
+      ;;
+  esac
+  i=$((i + 1))
+done
+
+if [[ ! -f "$REAL_BIN" ]]; then
+  echo "opencode wrapper: expected real binary at $REAL_BIN" >&2
+  exit 1
+fi
+
+"$REAL_BIN" "$@"
+exit_code=$?
+
+if [[ $exit_code -eq 0 && -n "$MODEL_ARG" ]]; then
+  mkdir -p "$OPENCODE_HOME"
+  echo "$MODEL_ARG" > "${OPENCODE_HOME}/current_model"
+  echo "Model updated to: $MODEL_ARG" >&2
+fi
+
+exit "$exit_code"
