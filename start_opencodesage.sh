@@ -1,6 +1,6 @@
 #!/bin/bash
-# opencodesage startup script - starts all services
-# Run from the opencodesage root directory: ./start_opencodesage.sh
+# OpenCodeSage startup script - starts all services
+# Run from the OpenCodeSage root directory: ./start_OpenCodeSage.sh
 
 set -e
 
@@ -52,11 +52,11 @@ cd "$BASE_DIR"
 if [[ -f "$BASE_DIR/opensage/.venv/bin/activate" ]]; then
   # shellcheck source=/dev/null
   source "$BASE_DIR/opensage/.venv/bin/activate"
-elif [[ -f "$BASE_DIR/opensage/opensage/.venv/bin/activate" ]]; then
+elif [[ -f "$BASE_DIR/opensage/.venv/bin/activate" ]]; then
   # shellcheck source=/dev/null
-  source "$BASE_DIR/opensage/opensage/.venv/bin/activate"
+  source "$BASE_DIR/opensage/.venv/bin/activate"
 else
-  echo "Note: no venv at opensage/.venv or opensage/opensage/.venv — using system python"
+  echo "Note: no venv at opensage/.venv or opensage/.venv — using system python"
 fi
 export OPENSAGE_API_PORT="${OPENSAGE_API_PORT:-5555}"
 python3 "$BASE_DIR/opensage_api.py" >/dev/null 2>&1 &

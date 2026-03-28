@@ -1,0 +1,17 @@
+MAIN_MODEL = "xai/grok-4-1-fast"
+TASK_NAME = "grok_test"
+
+[llm.model_configs.main]
+model_name = "${MAIN_MODEL}"
+temperature = 0.7
+max_tokens = 4096
+
+[llm.model_configs.summarize]
+model_name = "xai/grok-3-mini"
+temperature = 0.3
+max_tokens = 2048
+
+[llm.model_configs.flag_claims]
+model_name = "xai/grok-3-mini"
+temperature = 0.1
+max_tokens = 1024
