@@ -3,12 +3,12 @@
 Use OpenSage's Neo4j-powered persistent memory from any tool.
 
 ## API Server
-
 Start the memory API server:
 ```bash
-cd /Users/ghostgear/opensage
+# From the OpenCodeSage root directory:
+cd opensage
 source .venv/bin/activate
-python opensage_api.py
+python opensage_api.py &
 ```
 
 Server runs on: `http://localhost:5555`

@@ -12,7 +12,7 @@ Skills for integrating OpenCode with OpenSage's Neo4j memory system and dynamic 
 
 ### 1. Start All Services (Recommended)
 ```bash
-cd /Users/ghostgear/opencodesage
+# From the OpenCodeSage root directory:
 ./start_opencodesage.sh
 ```
 This starts Neo4j, Memory API, and Dynamic LLM Bridge with an interactive model selection menu.
@@ -25,7 +25,7 @@ brew services start neo4j
 /opt/homebrew/bin/neo4j start
 
 # 2. Start Memory API (port 5555)
-cd /Users/ghostgear/opensage
+cd opensage
 source .venv/bin/activate
 python opensage_api.py &
 
