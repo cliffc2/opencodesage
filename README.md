@@ -239,7 +239,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - Built upon [OpenCode](https://github.com/cliffc2/opencode) (your fork)
-- Built upon [OpenSage](https://github.com/opensage-agent/opensage)
+- Built upon [OpenSage](https://github.com/cliffc2/opensage)
 - Uses [litellm](https://github.com/BerriAI/litellm) for LLM abstraction
 - Uses [Neo4j](https://neo4j.com/) for persistent graph storage
 - Powered by free AI models: Minimax 2.5 Free and Nemotron 3 Super Free
